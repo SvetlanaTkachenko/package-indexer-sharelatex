@@ -1,6 +1,11 @@
 fs = require 'fs'
+child_process = require 'child_process'
 
-Indexer =
+module.exports = Indexer =
+
+	getCondaPackages: () ->
+		output = child_process.execSync ' conda search ".*" --names-only '
+		names = output.toString().split('\n').slice(1)
 
 	build: () ->
 		index =
