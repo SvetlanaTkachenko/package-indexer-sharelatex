@@ -7,14 +7,14 @@ module.exports = Indexer =
 		output = child_process.execSync ' conda search ".*" --names-only '
 		names = output.toString().split('\n').slice(1)
 		names.map (name) ->
-			{name: name, description: null}
+			{name: name, description: null, command: "conda install #{name}"}
 
 	getPipPackages: () ->
 		output = child_process.execSync ' pip search ".*" '
 		lines = output.toString().split('\n')
 		lines.map (line) ->
 			words = line.split /\s+-/
-			{name: words[0], description: words[1]}
+			{name: words[0], description: words[1], command: "pip install #{words[0]}"}
 
 	build: () ->
 		index =
