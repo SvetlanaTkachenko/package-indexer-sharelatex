@@ -19,6 +19,10 @@ module.exports = (grunt) ->
 				src: "app.coffee"
 				dest: "app.js"
 
+			indexer:
+				src: "indexer.coffee"
+				dest: "indexer.js"
+
 			unit_tests:
 				expand: true
 				cwd:  "test/unit/coffee"
@@ -41,6 +45,7 @@ module.exports = (grunt) ->
 				ext:  ".js"
 
 		clean:
+			indexer: ["indexer.js"]
 			app: ["app/js/"]
 			unit_tests: ["test/unit/js"]
 			acceptance_tests: ["test/acceptance/js"]
@@ -49,6 +54,8 @@ module.exports = (grunt) ->
 		execute:
 			app:
 				src: "app.js"
+			indexer:
+				src: "indexer.js"
 
 		watch:
 			server_coffee:
@@ -81,8 +88,10 @@ module.exports = (grunt) ->
 	grunt.loadNpmTasks 'grunt-bunyan'
 	grunt.loadNpmTasks 'grunt-forever'
 
-	grunt.registerTask 'compile:app', ['clean:app', 'coffee:app', 'coffee:app_src']
-	grunt.registerTask 'run',         ['compile:app', 'bunyan', 'execute']
+	grunt.registerTask 'compile:app',     ['clean:app', 'coffee:app', 'coffee:app_src']
+	grunt.registerTask 'compile:indexer', ['clean:indexer', 'coffee:indexer']
+	grunt.registerTask 'run',             ['compile:app', 'bunyan', 'execute']
+	grunt.registerTask 'run:indexer',     ['compile:indexer', 'execute:indexer']
 
 	grunt.registerTask 'compile:unit_tests', ['clean:unit_tests', 'coffee:unit_tests']
 	grunt.registerTask 'test:unit',          ['compile:app', 'compile:unit_tests', 'mochaTest:unit']
