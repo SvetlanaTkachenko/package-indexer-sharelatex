@@ -1,3 +1,4 @@
+fs = require 'fs'
 
 Indexer =
 
@@ -5,7 +6,7 @@ Indexer =
 		index =
 			indexBuiltAt: new Date().toISOString()
 			packages:
-				pyhon: {}
+				python: {}
 				r: {}
 
 		return index

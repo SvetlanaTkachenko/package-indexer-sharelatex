@@ -1,6 +1,8 @@
 (function() {
-  var Indexer, args, result, result_json,
+  var Indexer, args, fs, result, result_json,
     __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
+
+  fs = require('fs');
 
   Indexer = {
     build: function() {
@@ -8,7 +10,7 @@
       index = {
         indexBuiltAt: new Date().toISOString(),
         packages: {
-          pyhon: {},
+          python: {},
           r: {}
         }
       };
