@@ -6,13 +6,11 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 	config.vm.box = "phusion-open-ubuntu-14.04-amd64"
 	config.vm.box_url = "https://oss-binaries.phusionpassenger.com/vagrant/boxes/latest/ubuntu-14.04-amd64-vbox.box"
 
-	config.ssh.forward_agent = true
-
-	config.vm.network "forwarded_port", guest: 3022, host: 3022
-
 	config.vm.provider "virtualbox" do |v|
 		v.memory = 2048
 	end
+
+	config.vm.network "forwarded_port", guest: 3022, host: 3022
 
 	config.vm.provision "shell" do |s|
 		s.inline = <<-SCRIPT
@@ -57,9 +55,10 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 			curl https://raw.githubusercontent.com/creationix/nvm/v0.17.3/install.sh | bash
 			export NVM_DIR="/home/vagrant/.nvm"
 			[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"  # This loads nvm
-			nvm install 0.10
-			nvm use 0.10
-			echo "nvm use 0.10" >> ~/.profile
+      mkdir -p ~/.nvm/versions
+      nvm install 4.1
+			nvm use 4.1
+			echo "nvm use 4.1" >> ~/.profile
 			npm install -g grunt-cli
 
 			echo "export SHARELATEX_CONFIG=~/settings.development.coffee" >> ~/.profile
