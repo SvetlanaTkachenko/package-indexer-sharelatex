@@ -4,3 +4,4 @@ test/unit/js
 test/acceptance/js
 app.js
 forever
+.vagrant/
