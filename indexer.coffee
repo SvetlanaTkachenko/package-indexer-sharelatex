@@ -6,6 +6,15 @@ module.exports = Indexer =
 	getCondaPackages: () ->
 		output = child_process.execSync ' conda search ".*" --names-only '
 		names = output.toString().split('\n').slice(1)
+		names.map (name) ->
+			{name: name, description: null}
+
+	getPipPackages: () ->
+		output = child_process.execSync ' pip search ".*" '
+		lines = output.toString().split('\n')
+		lines.map (line) ->
+			words = line.split /\s+-/
+			{name: words[0], description: words[1]}
 
 	build: () ->
 		index =
