@@ -1,0 +1,36 @@
+{
+  "name": "package-indexer-sharelatex",
+  "version": "0.1.0",
+  "description": "Fixme",
+  "author": "ShareLaTeX <team@sharelatex>",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sharelatex/package-indexer-sharelatex.git"
+  },
+  "dependencies": {
+    "settings-sharelatex": "git+https://github.com/sharelatex/settings-sharelatex.git#v1.0.0",
+    "logger-sharelatex": "git+https://github.com/sharelatex/logger-sharelatex.git#v1.0.0",
+    "metrics-sharelatex": "git+https://github.com/sharelatex/metrics-sharelatex.git#v1.1.0",
+    "mongojs": "0.18.2",
+    "express": "~4.1.1",
+    "underscore": "~1.6.0",
+    "body-parser": "~1.0.2",
+		"async": "~0.8.0"
+  },
+  "devDependencies": {
+    "grunt-execute": "~0.2.1",
+    "grunt-contrib-clean": "~0.5.0",
+    "grunt-shell": "~0.7.0",
+    "grunt-contrib-coffee": "~0.10.1",
+    "grunt-mocha-test": "~0.10.2",
+    "grunt-contrib-watch": "0.5.3",
+    "grunt": "~0.4.4",
+    "bunyan": "~0.22.3",
+    "grunt-bunyan": "~0.5.0",
+    "sinon": "~1.5.2",
+    "sandboxed-module": "~0.3.0",
+    "chai": "~1.9.1",
+    "grunt-forever": "~0.4.4",
+    "request": "~2.34.0"
+  }
+}
