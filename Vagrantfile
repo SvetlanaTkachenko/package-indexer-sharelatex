@@ -8,6 +8,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
 	config.ssh.forward_agent = true
 
+	config.vm.network "forwarded_port", guest: 3022, host: 3022
+
 	config.vm.provider "virtualbox" do |v|
 		v.memory = 2048
 	end
