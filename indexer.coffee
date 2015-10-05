@@ -66,7 +66,12 @@ module.exports = Indexer =
 						return callback err, null
 					packages = {}
 					for p in results
-						packages[p.name] = p.details
+						packages[p.name] =
+							name: p.name
+							description: p?.info?.description
+							url: p?.info?.package_url
+							summary: p?.info?.summary
+							command: "pip install '#{p.name}'"
 					callback null, packages
 			)
 
@@ -77,19 +82,9 @@ module.exports = Indexer =
 				python: {}
 				r: {}
 
-		conda = Indexer.getCondaPackages()
-		pip = Indexer.getPipPackages()
-
-		console.log "    "
-		console.log ">> conda: #{Object.keys(conda).length}"
-		console.log conda[Object.keys(conda)[0]]
-		console.log ">> pip: #{Object.keys(pip).length}"
-		console.log pip[Object.keys(pip)[0]]
-
-
-
-
-		return index
+		conda_packages = Indexer.getCondaPackages()
+		Indexer.getPipPackages (err, pip_packages) ->
+			console.log pip_packages
 
 
 # args = process.argv.slice(2)
