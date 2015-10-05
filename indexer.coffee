@@ -76,13 +76,13 @@ module.exports = Indexer =
 			for name in conda_only
 				python_packages[name] = conda_packages[name]
 
-			for name in pip_only
-				python_packages[name] = pip_packages[name]
-
 			for name in pip_and_conda
 				p = Object.assign(pip_packages[name])
 				p.command = conda_packages[name].command
 				python_packages[name] = p
+
+			for name in pip_only
+				python_packages[name] = pip_packages[name]
 
 			callback(null, python_packages)
 
