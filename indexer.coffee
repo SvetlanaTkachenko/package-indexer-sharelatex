@@ -5,6 +5,9 @@ cheerio = require 'cheerio'
 _ = require 'underscore'
 async = require 'async'
 
+pypi_url = 'http://pypi.local'
+
+
 module.exports = Indexer =
 
 	getCondaPackages: () ->
@@ -15,17 +18,18 @@ module.exports = Indexer =
 		return result
 
 	getPipPackages: (callback) ->
-		request.get {uri:'https://pypi.python.org/simple/'}, (err, response, body) ->
+		request.get {uri:"http://pypi.python.org/simple/"}, (err, response, body) ->
 			if err?
 				return callback err, null
 			page = cheerio.load(body)
 			package_names = page.root().text().split('\n').slice(1, 10000)  # FIXME: testing on just 200 packages
-			async.map(
+			async.mapLimit(
 				package_names,
+				100,
 				(package_name, cb) ->
 					# console.log ">> getting #{package_name}"
 					opts =
-						uri: "https://pypi.python.org/pypi/#{package_name}/json"
+						uri: "#{pypi_url}/pypi/#{package_name}/json"
 						json: true
 						timeout: 600 * 1000
 					request.get opts, (err, response, body) ->
