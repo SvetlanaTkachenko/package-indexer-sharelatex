@@ -19,7 +19,7 @@ module.exports = Indexer =
 			if err?
 				return callback err, null
 			page = cheerio.load(body)
-			package_names = page.root().text().split('\n').slice(1, 1000)  # FIXME: testing on just 200 packages
+			package_names = page.root().text().split('\n').slice(1, 10000)  # FIXME: testing on just 200 packages
 			async.map(
 				package_names,
 				(package_name, cb) ->
@@ -27,9 +27,12 @@ module.exports = Indexer =
 					opts =
 						uri: "https://pypi.python.org/pypi/#{package_name}/json"
 						json: true
+						timeout: 600 * 1000
 					request.get opts, (err, response, body) ->
 						if err?
-							return cb err, null
+							error = new Error("Error: could not get #{package_name} from pypi. status: #{response?.statusCode}, message: #{err.message}")
+							error.err = err
+							return cb error, null
 						info =
 							name: package_name,
 							details: if response.statusCode == 200 then body else null
@@ -61,6 +64,8 @@ module.exports = Indexer =
 		console.log ">> got all conda packages"
 
 		Indexer.getPipPackages (err, pip_packages) ->
+			if err?
+				return callback err
 			console.log ">> got all pip packages"
 			pip_names = _.keys(pip_packages)
 			pip_and_conda = _.intersection(conda_names, pip_names)
@@ -99,6 +104,8 @@ module.exports = Indexer =
 
 args = process.argv.slice(2)
 Indexer.build (err, result) ->
+	if err
+		throw err
 	if '--save' in args
 		result_json = JSON.stringify(result, null, 2)
 		fs.writeFileSync(__dirname + '/data/packageIndex.json', result_json)
