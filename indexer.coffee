@@ -54,12 +54,9 @@ module.exports = Indexer =
 					request.get opts, (err, response, body) ->
 						if err?
 							return cb err, null
-						console.log ">> got #{package_name}"
 						info =
 							name: package_name,
-							details: null
-						if response.statusCode == 200
-							info.details = body
+							details: if response.statusCode == 200 then body else null
 						cb null, info
 				(err, results) ->
 					if err?
@@ -68,9 +65,9 @@ module.exports = Indexer =
 					for p in results
 						packages[p.name] =
 							name: p.name
-							description: p?.info?.description
-							url: p?.info?.package_url
-							summary: p?.info?.summary
+							description: p?.details?.info.description
+							url: p?.details?.info.package_url
+							summary: p?.details?.info.summary
 							command: "pip install '#{p.name}'"
 					callback null, packages
 			)
