@@ -33,8 +33,7 @@ module.exports = Indexer =
 
 	getCondaPackages: () ->
 		result = {}
-		env = Object.assign process.env, {'COLUMNS': 200000}
-		conda_output = child_process.execSync ' conda search ".*" --names-only ', {env: env}
+		conda_output = child_process.execSync ' conda search ".*" --names-only '
 		names = conda_output.toString().split('\n').slice(1)  # skip first line of output
 		(result[name] = {name: name, description: null, command: "conda install #{name}"} for name in names)
 		return result
@@ -65,7 +64,10 @@ module.exports = Indexer =
 				(err, results) ->
 					if err?
 						return callback err, null
-					callback null, results
+					packages = {}
+					for p in results
+						packages[p.name] = p.details
+					callback null, packages
 			)
 
 	build: () ->
