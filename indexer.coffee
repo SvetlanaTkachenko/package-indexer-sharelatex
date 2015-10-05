@@ -43,7 +43,7 @@ module.exports = Indexer =
 			if err?
 				return callback err, null
 			page = cheerio.load(body)
-			package_names = page.root().text().split('\n').slice(1, 200)
+			package_names = page.root().text().split('\n').slice(1, 200)  # FIXME: testing on just 200 packages
 			async.map(
 				package_names,
 				(package_name, cb) ->
