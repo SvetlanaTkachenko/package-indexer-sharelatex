@@ -22,7 +22,7 @@ module.exports = Indexer =
 			if err?
 				return callback err, null
 			page = cheerio.load(body)
-			package_names = page.root().text().split('\n').slice(1, 10000)  # FIXME: testing on just 200 packages
+			package_names = page.root().text().split('\n').slice(1)
 			async.mapLimit(
 				package_names,
 				100,
@@ -79,7 +79,7 @@ module.exports = Indexer =
 			# console.log conda_only
 			console.log ">> pip: #{pip_only.length}"
 			console.log ">> conda: #{conda_only.length}"
-			console.log ">> both: #{pip_and_conda.length} : #{pip_and_conda}"
+			console.log ">> both: #{pip_and_conda.length}"
 
 			python_packages = {}
 			for name in conda_only
