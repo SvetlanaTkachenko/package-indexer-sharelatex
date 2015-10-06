@@ -133,8 +133,8 @@ module.exports = Indexer =
 				description: row.Description
 				url: "https://cran.rstudio.com/web/packages/#{row.Package}/index.html"
 				command: [
-					"sudo", "Rscript", "-e", "install.packages('#{$scope.installedPackage}');
-					suppressMessages(suppressWarnings(if(!require('#{$scope.installedPackage}')) {
+					"sudo", "Rscript", "-e", "install.packages('#{row.Package}');
+					suppressMessages(suppressWarnings(if(!require('#{row.Package}')) {
 						stop('Could not load package', call.=FALSE)
 					}))"
 				]
