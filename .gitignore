@@ -7,3 +7,4 @@ indexer.js
 forever
 .vagrant/
 data/packageIndex.json
+.Rhistory
