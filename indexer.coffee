@@ -114,17 +114,36 @@ module.exports = Indexer =
 					url: null
 					command: "sudo apt-get install #{name}"
 				}
-		return _.without(packages, undefined)
+		result = {}
+		for p in _.without(packages, undefined)
+			result[p.name] = p
 
 	getRemoteCranPackages: (callback) ->
 		command_out = child_process.execSync """
-				echo 'write.table(available.packages(), sep=",")' | R --no-save --slave
+				echo 'write.table(available.packages(fields=c("Description", "Title")), sep=",")' | R --no-save --slave
 		"""
 		csv_data = command_out.toString()
-		CsvParse csv_data, {delimiter: ',', columns: true}, (err, table) ->
+		CsvParse csv_data, {delimiter: ',', columns: true}, (err, parsed) ->
+			console.log parsed[0]
 			if err
-				throw err
-			console.log table.slice(0, 4)
+				callback err, null
+			packages = parsed.map (row) ->
+				name: row.Package
+				summary: row.Title
+				description: row.Description
+				url: "https://cran.rstudio.com/web/packages/#{row.Package}/index.html"
+				command: """
+					sudo Rscript -e '
+						installPackages(#{row.Package});
+						suppressMessages(suppressWarnings(if(!require('#{row.Package}')) {
+							stop('Could not load package', call.=FALSE)
+						}))
+				"""
+			result = {}
+			for p in packages
+				result[p.name] = p
+
+			callback null, result
 
 
 	build: (callback) ->
