@@ -16,7 +16,7 @@ module.exports = Indexer =
 		result = {}
 		conda_output = child_process.execSync ' conda search ".*" --names-only '
 		names = conda_output.toString().split('\n').slice(1)  # skip first line of output
-		(result[name] = {name: name, description: null, url: null, summary: null,command: "conda install -y #{name}"} for name in names)
+		(result[name] = {name: name, description: null, url: null, summary: null,command: ["conda", "install", "-y", name]} for name in names)
 		return result
 
 	getPipPackages: (callback) ->
@@ -54,7 +54,7 @@ module.exports = Indexer =
 							description: p?.details?.info.description
 							url: p?.details?.info.package_url
 							summary: p?.details?.info.summary
-							command: "pip install '#{p.name}'"
+							command: ["pip", "install", p.name]
 					callback null, packages
 			)
 
@@ -112,7 +112,7 @@ module.exports = Indexer =
 					summary: summary
 					description: null
 					url: null
-					command: "sudo apt-get install #{name}"
+					command: ["sudo", "apt-get", "install", name]
 				}
 		result = {}
 		for p in _.without(packages, undefined)
@@ -132,13 +132,12 @@ module.exports = Indexer =
 				summary: row.Title
 				description: row.Description
 				url: "https://cran.rstudio.com/web/packages/#{row.Package}/index.html"
-				command: """
-					sudo Rscript -e '
-						installPackages(#{row.Package});
-						suppressMessages(suppressWarnings(if(!require('#{row.Package}')) {
-							stop('Could not load package', call.=FALSE)
-						}))
-				"""
+				command: [
+					"sudo", "Rscript", "-e", "install.packages('#{$scope.installedPackage}');
+					suppressMessages(suppressWarnings(if(!require('#{$scope.installedPackage}')) {
+						stop('Could not load package', call.=FALSE)
+					}))"
+				]
 			result = {}
 			for p in packages
 				result[p.name] = p
