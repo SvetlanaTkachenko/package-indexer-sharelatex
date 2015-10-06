@@ -91,6 +91,7 @@ module.exports = Indexer =
 			for name in pip_and_conda
 				p = Object.assign(pip_packages[name])
 				p.command = conda_packages[name].command
+				p.source = 'conda'
 				python_packages[name] = p
 
 			for name in pip_only
