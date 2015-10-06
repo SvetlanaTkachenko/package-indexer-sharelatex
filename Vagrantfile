@@ -44,6 +44,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
 	config.vm.provision "shell" do |s|
 		s.inline = <<-EOF
+      echo "options("repos"="http://cran.rstudio.com")" >> ~/.Rprofile
       echo "Installing BiocLite"
       echo 'source("http://bioconductor.org/biocLite.R");biocLite()' | sudo R --no-save
 		EOF

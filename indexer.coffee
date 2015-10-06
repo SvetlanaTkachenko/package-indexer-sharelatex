@@ -4,6 +4,8 @@ request = require 'request'
 cheerio = require 'cheerio'
 _ = require 'underscore'
 async = require 'async'
+CsvParse = require 'csv-parse'
+
 
 pypi_url = 'http://pypi.local'
 
@@ -114,6 +116,15 @@ module.exports = Indexer =
 				}
 		return _.without(packages, undefined)
 
+	getRemoteCranPackages: (callback) ->
+		command_out = child_process.execSync """
+				echo 'write.table(available.packages(), sep=",")' | R --no-save --slave
+		"""
+		csv_data = command_out.toString()
+		CsvParse csv_data, {delimiter: ',', columns: true}, (err, table) ->
+			if err
+				throw err
+			console.log table.slice(0, 4)
 
 
 	build: (callback) ->
@@ -127,12 +138,12 @@ module.exports = Indexer =
 					r: {}
 			callback null, final_index
 
-args = process.argv.slice(2)
-Indexer.build (err, result) ->
-	if err
-		throw err
-	if '--save' in args
-		result_json = JSON.stringify(result, null, 2)
-		fs.writeFileSync(__dirname + '/data/packageIndex.json', result_json)
-	if '--print' in args
-		console.log result
+# args = process.argv.slice(2)
+# Indexer.build (err, result) ->
+# 	if err
+# 		throw err
+# 	if '--save' in args
+# 		result_json = JSON.stringify(result, null, 2)
+# 		fs.writeFileSync(__dirname + '/data/packageIndex.json', result_json)
+# 	if '--print' in args
+# 		console.log result
