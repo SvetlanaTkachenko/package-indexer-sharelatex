@@ -16,7 +16,7 @@ module.exports = Indexer =
 		result = {}
 		conda_output = child_process.execSync ' conda search ".*" --names-only '
 		names = conda_output.toString().split('\n').slice(1)  # skip first line of output
-		(result[name] = {name: name, description: null, url: null, summary: null,command: ["conda", "install", "-y", name]} for name in names)
+		(result[name] = {name: name, description: null, source: 'conda', url: null, summary: null,command: ["conda", "install", "-y", name]} for name in names)
 		return result
 
 	getPipPackages: (callback) ->
@@ -52,6 +52,7 @@ module.exports = Indexer =
 						packages[p.name] =
 							name: p.name.toLowerCase()  # Because pip is case-insensitive, coerce to lowercase
 							description: p?.details?.info.description
+							source: 'pip'
 							url: p?.details?.info.package_url
 							summary: p?.details?.info.summary
 							command: ["pip", "install", p.name]
@@ -108,15 +109,17 @@ module.exports = Indexer =
 				name = match[1]
 				summary = match[2]
 				return {
-					name: name
+					name: name.slice(7)
 					summary: summary
 					description: null
+					source: 'apt'
 					url: null
 					command: ["sudo", "apt-get", "install", name]
 				}
 		result = {}
 		for p in _.without(packages, undefined)
 			result[p.name] = p
+		result
 
 	getRemoteCranPackages: (callback) ->
 		command_out = child_process.execSync """
@@ -131,6 +134,7 @@ module.exports = Indexer =
 				name: row.Package
 				summary: row.Title
 				description: row.Description
+				source: 'cran'
 				url: "https://cran.rstudio.com/web/packages/#{row.Package}/index.html"
 				command: [
 					"sudo", "Rscript", "-e", "install.packages('#{row.Package}');
@@ -155,6 +159,7 @@ module.exports = Indexer =
 				name: name
 				summary: null
 				description: null
+				source: 'bioconductor'
 				url: "http://bioconductor.org/packages/release/bioc/html/#{name}.html"
 				command: [
 					"sudo", "Rscript", "-e",
