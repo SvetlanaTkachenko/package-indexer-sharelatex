@@ -25,7 +25,7 @@ module.exports = Indexer =
 			package_names = page.root().text().split('\n').slice(1)
 			async.mapLimit(
 				package_names,
-				100,
+				200,
 				(package_name, cb) ->
 					# console.log ">> getting #{package_name}"
 					opts =

@@ -6,3 +6,4 @@ app.js
 indexer.js
 forever
 .vagrant/
+data/packageIndex.json
