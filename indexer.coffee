@@ -95,6 +95,27 @@ module.exports = Indexer =
 
 			callback(null, python_packages)
 
+	getAptCranPackages: () ->
+		child_process.execSync ' sudo apt-get update '
+		apt_packages = child_process.execSync ' apt-cache search "r-cran-.*" | grep "^r-cran.*$"'
+		lines = apt_packages.toString().split('\n')
+		packages = lines.map (line) ->
+			console.log line
+			match = line.match /^(.*) - (.*)$/
+			if match
+				name = match[1]
+				summary = match[2]
+				return {
+					name: name
+					summary: summary
+					description: null
+					url: null
+					command: "sudo apt-get install #{name}"
+				}
+		return _.without(packages, undefined)
+
+
+
 	build: (callback) ->
 		Indexer.buildPythonIndex (err, python_index) ->
 			if err?
