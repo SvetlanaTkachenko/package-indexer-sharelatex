@@ -144,6 +144,33 @@ module.exports = Indexer =
 
 			callback null, result
 
+	getBioConductorPackages: (callback) ->
+		command_out = child_process.execSync """
+			echo 'source("http://bioconductor.org/biocLite.R"); cat(BiocInstaller::all_group())' | R --no-save --slave
+		"""
+		bioc_packages = command_out.toString().split(" ")
+		result = {}
+		for name in bioc_packages
+			result[name] =
+				name: name
+				summary: null
+				description: null
+				url: "http://bioconductor.org/packages/release/bioc/html/#{name}.html"
+				command: [
+					"sudo", "Rscript", "-e",
+					"if (!require(BiocInstaller,quietly=TRUE)) {
+						source('http://bioconductor.org/biocLite.R')
+					} else {
+						library(BiocInstaller);
+					};
+					biocLite('#{name}') ;
+					suppressMessages(suppressWarnings(if(!require('#{name}')) {
+						stop('Could not load package', call.=FALSE)
+					}))"
+				]
+		callback null, result
+
+
 
 	build: (callback) ->
 		Indexer.buildPythonIndex (err, python_index) ->
