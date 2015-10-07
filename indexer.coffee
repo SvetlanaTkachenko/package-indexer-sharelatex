@@ -86,7 +86,7 @@ module.exports = Indexer =
 				python_packages[name] = conda_packages[name]
 
 			for name in pip_and_conda
-				p = Object.assign(pip_packages[name])
+				p = _.extend({}, pip_packages[name])
 				p.command = conda_packages[name].command
 				p.source = 'conda'
 				python_packages[name] = p
@@ -194,12 +194,21 @@ module.exports = Indexer =
 				apt_and_cran = _.intersection(apt_names, cran_names)
 				console.log ">> #{apt_only.length} - #{cran_only.length} - #{apt_and_cran.length} - #{bioc_names.length}"
 
+				# merge all into index
 				for name in bioc_names
 					r_packages[name] = bioc_packages[name]
 				for name in cran_only
 					r_packages[name] = cran_packages[name]
-				callback null, r_packages
+				for name in apt_only
+					r_packages[name] = apt_packages[name]
+				for name in apt_and_cran
+					merged = _.extend({}, cran_packages[name])
+					apt = apt_packages[name]
+					merged.command = apt.command
+					merged.source = apt.source
+					r_packages[name] = merged
 
+				callback null, r_packages
 
 	build: (callback) ->
 		Indexer.buildPythonIndex (err, python_index) ->
