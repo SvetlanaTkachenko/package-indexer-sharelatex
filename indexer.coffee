@@ -34,7 +34,6 @@ module.exports = Indexer =
 				package_names,
 				200,
 				(package_name, cb) ->
-					# console.log ">> getting #{package_name}"
 					opts =
 						uri: "#{pypi_url}/pypi/#{package_name}/json"
 						json: true
@@ -47,7 +46,6 @@ module.exports = Indexer =
 						info =
 							name: package_name,
 							details: if response.statusCode == 200 then body else null
-						# console.log ">> got #{package_name}"
 						cb null, info
 				(err, results) ->
 					if err?
@@ -65,12 +63,6 @@ module.exports = Indexer =
 			)
 
 	buildPythonIndex: (callback) ->
-		index =
-			indexBuiltAt: new Date().toISOString()
-			packages:
-				python: {}
-				r: {}
-
 		conda_packages = Indexer.getCondaPackages()
 		conda_names = _.keys(conda_packages)
 		console.log ">> got all conda packages"
@@ -109,7 +101,6 @@ module.exports = Indexer =
 		apt_packages = child_process.execSync ' apt-cache search "r-cran-.*" | grep "^r-cran.*$"'
 		lines = apt_packages.toString().split('\n')
 		packages = lines.map (line) ->
-			console.log line
 			match = line.match /^(.*) - (.*)$/
 			if match
 				name = match[1]
@@ -133,7 +124,6 @@ module.exports = Indexer =
 		"""
 		csv_data = command_out.toString()
 		CsvParse csv_data, {delimiter: ',', columns: true}, (err, parsed) ->
-			console.log parsed[0]
 			if err
 				callback err, null
 			packages = parsed.map (row) ->
@@ -181,6 +171,34 @@ module.exports = Indexer =
 				]
 		callback null, result
 
+	buildRIndex: (callback) ->
+		apt_packages = Indexer.getAptCranPackages()
+		apt_names = _.keys(apt_packages)
+		console.log ">> got all apt-cran packages"
+
+		Indexer.getRemoteCranPackages (err, cran_packages) ->
+			if err?
+				return callback err
+			console.log ">> got all cran packages"
+			cran_names = _.keys(cran_packages)
+			Indexer.getBioConductorPackages (err, bioc_packages) ->
+				if err?
+					return callback err
+				console.log ">> got all bioconductor packages"
+				bioc_names = _.keys(bioc_packages)
+
+				r_packages = {}
+				# merge
+				apt_only = _.difference(apt_names, cran_names)
+				cran_only = _.difference(cran_names, apt_names)
+				apt_and_cran = _.intersection(apt_names, cran_names)
+				console.log ">> #{apt_only.length} - #{cran_only.length} - #{apt_and_cran.length} - #{bioc_names.length}"
+
+				for name in bioc_names
+					r_packages[name] = bioc_packages[name]
+				for name in cran_only
+					r_packages[name] = cran_packages[name]
+				callback null, r_packages
 
 
 	build: (callback) ->
