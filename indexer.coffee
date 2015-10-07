@@ -18,10 +18,12 @@ module.exports = Indexer =
 		names = _.without(conda_output.toString().split('\n').slice(1), '')  # skip first line of output
 		(result[name] = {
 			name: name,
+			title: name
 			description: null,
-			source: 'conda',
+			provider:
+				source: 'conda',
 			url: null,
-			summary: null,command: ["conda", "install", "-y", name]} for name in names)
+			summary: null} for name in names)
 		return result
 
 	getPipPackages: (callback) ->
@@ -54,11 +56,12 @@ module.exports = Indexer =
 					for p in results
 						packages[p.name] =
 							name: p.name.toLowerCase()  # Because pip is case-insensitive, coerce to lowercase
+							title: p.name
 							description: p?.details?.info.description
-							source: 'pip'
+							provider:
+								source: 'pip'
 							url: p?.details?.info.package_url
 							summary: p?.details?.info.summary
-							command: ["pip", "install", p.name]
 					callback null, packages
 			)
 
@@ -87,8 +90,7 @@ module.exports = Indexer =
 
 			for name in pip_and_conda
 				p = _.extend({}, pip_packages[name])
-				p.command = conda_packages[name].command
-				p.source = 'conda'
+				p.provider.source = 'conda'
 				python_packages[name] = p
 
 			for name in pip_only
@@ -107,11 +109,12 @@ module.exports = Indexer =
 				summary = match[2]
 				return {
 					name: name.slice(7)
+					title: name.slice(7)
 					summary: summary
 					description: null
-					source: 'apt'
+					provider:
+						source: 'apt'
 					url: null
-					command: ["sudo", "apt-get", "install", name]
 				}
 		result = {}
 		for p in _.without(packages, undefined)
@@ -128,16 +131,12 @@ module.exports = Indexer =
 				callback err, null
 			packages = parsed.map (row) ->
 				name: row.Package
+				title: row.Package
 				summary: row.Title
 				description: row.Description
-				source: 'cran'
+				provider:
+					source: 'cran'
 				url: "https://cran.rstudio.com/web/packages/#{row.Package}/index.html"
-				command: [
-					"sudo", "Rscript", "-e", "install.packages('#{row.Package}');
-					suppressMessages(suppressWarnings(if(!require('#{row.Package}')) {
-						stop('Could not load package', call.=FALSE)
-					}))"
-				]
 			result = {}
 			for p in packages
 				result[p.name] = p
@@ -153,22 +152,12 @@ module.exports = Indexer =
 		for name in bioc_packages
 			result[name] =
 				name: name
+				title: name
 				summary: null
 				description: null
-				source: 'bioconductor'
+				provider:
+					source: 'bioconductor'
 				url: "http://bioconductor.org/packages/release/bioc/html/#{name}.html"
-				command: [
-					"sudo", "Rscript", "-e",
-					"if (!require(BiocInstaller,quietly=TRUE)) {
-						source('http://bioconductor.org/biocLite.R')
-					} else {
-						library(BiocInstaller);
-					};
-					biocLite('#{name}') ;
-					suppressMessages(suppressWarnings(if(!require('#{name}')) {
-						stop('Could not load package', call.=FALSE)
-					}))"
-				]
 		callback null, result
 
 	buildRIndex: (callback) ->
@@ -204,8 +193,7 @@ module.exports = Indexer =
 				for name in apt_and_cran
 					merged = _.extend({}, cran_packages[name])
 					apt = apt_packages[name]
-					merged.command = apt.command
-					merged.source = apt.source
+					merged.provider = apt.provider
 					r_packages[name] = merged
 
 				callback null, r_packages
