@@ -44,8 +44,8 @@ app.use (error, req, res, next) ->
 		res.send(500, "Oops, something went wrong")
 
 
-port = Settings.internal.packageindexer.port
-host = Settings.internal.packageindexer.host
+port = Settings.internal.packageindex.port
+host = Settings.internal.packageindex.host
 app.listen port, host, (error) ->
 	throw error if error?
 	logger.info "#{app_name} starting up, listening on #{host}:#{port}"
