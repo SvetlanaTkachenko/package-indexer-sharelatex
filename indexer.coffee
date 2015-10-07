@@ -47,7 +47,7 @@ module.exports = Indexer =
 							return cb error, null
 						info =
 							name: package_name,
-							details: if response.statusCode == 200 then body else null
+							details: if response.statusCode == 200 then body else {info: {}}
 						cb null, info
 				(err, results) ->
 					if err?
@@ -57,11 +57,11 @@ module.exports = Indexer =
 						packages[p.name] =
 							name: p.name.toLowerCase()  # Because pip is case-insensitive, coerce to lowercase
 							title: p.name
-							description: p?.details?.info.description
+							description: p.details.info.description or null
 							provider:
 								source: 'pip'
-							url: p?.details?.info.package_url
-							summary: p?.details?.info.summary
+							url: p.details.info.package_url or null
+							summary: p.details.info.summary or null
 					callback null, packages
 			)
 
