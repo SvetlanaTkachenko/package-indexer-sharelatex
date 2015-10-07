@@ -17,7 +17,7 @@ module.exports = Indexer =
 		conda_output = child_process.execSync ' conda search ".*" --names-only '
 		names = _.without(conda_output.toString().split('\n').slice(1), '')  # skip first line of output
 		(result[name] = {
-			name: name,
+			name: name.trim(),
 			title: name
 			description: null,
 			provider:
@@ -54,8 +54,9 @@ module.exports = Indexer =
 						return callback err, null
 					packages = {}
 					for p in results
-						packages[p.name] =
-							name: p.name.toLowerCase()  # Because pip is case-insensitive, coerce to lowercase
+						name = p.name.toLowerCase().trim()
+						packages[name] =
+							name: name # Because pip is case-insensitive, coerce to lowercase
 							title: p.name
 							description: p.details.info.description or null
 							provider:
@@ -85,16 +86,15 @@ module.exports = Indexer =
 			console.log ">> both: #{pip_and_conda.length}"
 
 			python_packages = {}
+			for name in pip_only
+				python_packages[name] = pip_packages[name]
 			for name in conda_only
 				python_packages[name] = conda_packages[name]
-
 			for name in pip_and_conda
 				p = _.extend({}, pip_packages[name])
 				p.provider.source = 'conda'
 				python_packages[name] = p
 
-			for name in pip_only
-				python_packages[name] = pip_packages[name]
 
 			callback(null, python_packages)
 
