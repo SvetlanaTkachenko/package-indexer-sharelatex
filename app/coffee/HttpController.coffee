@@ -18,14 +18,14 @@ module.exports = HttpController =
 	search: (req, res, next = (error) ->) ->
 		search_params = req.body
 		query = {
-			"$text": {"$search": search_params.query},
+			name: {$regex: new RegExp("^#{search_params.query}")}
 			"language": search_params.language or 'python'
 		}
 		logger.log params: search_params, "searching package index"
-		db.searchIndex.find(query).limit(100, (err, docs=[]) ->
+		db.packageIndex.find(query).limit 100, (err, docs=[]) ->
 			if err
 				return next err
-			logger.log params: search_params, count: docs.length "found packages in index, sending to client"
+			logger.log params: search_params, count: docs.length, "found packages in index, sending to client"
 			res.setHeader "Content-Type", "application/json"
 			result =
 				searchParams: search_params
