@@ -3,8 +3,8 @@ http.globalAgent.maxSockets = 300
 
 module.exports =
 	internal:
-		packageindex:
-			port: 3034
+		packageindexer:
+			port: 3022
 			host: "localhost"
 
 	mongo:
