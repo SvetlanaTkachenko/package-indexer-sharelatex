@@ -17,10 +17,10 @@ module.exports = HttpController =
 
 	search: (req, res, next = (error) ->) ->
 		search_params = req.body
-		query = {
+		# simple regex match on the name field for now.
+		query =
 			name: {$regex: new RegExp("^#{search_params.query}")}
-			"language": search_params.language or 'python'
-		}
+			language: search_params.language or 'python'
 		logger.log params: search_params, "searching package index"
 		db.packageIndex.find(query).limit 100, (err, docs=[]) ->
 			if err
