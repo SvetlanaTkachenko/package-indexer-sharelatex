@@ -15,8 +15,13 @@ module.exports = Indexer =
 	getCondaPackages: () ->
 		result = {}
 		conda_output = child_process.execSync ' conda search ".*" --names-only '
-		names = conda_output.toString().split('\n').slice(1)  # skip first line of output
-		(result[name] = {name: name, description: null, source: 'conda', url: null, summary: null,command: ["conda", "install", "-y", name]} for name in names)
+		names = _.without(conda_output.toString().split('\n').slice(1), '')  # skip first line of output
+		(result[name] = {
+			name: name,
+			description: null,
+			source: 'conda',
+			url: null,
+			summary: null,command: ["conda", "install", "-y", name]} for name in names)
 		return result
 
 	getPipPackages: (callback) ->
@@ -36,7 +41,7 @@ module.exports = Indexer =
 						timeout: 600 * 1000
 					request.get opts, (err, response, body) ->
 						if err?
-							error = new Error("Error: could not get #{package_name} from pypi. status: #{response?.statusCode}, message: #{err.message}")
+							error = new Error("Error: could not get #{package_name} from pypi. status: #{response?.statusCode}, #{err.message}")
 							error.err = err
 							return cb error, null
 						info =
