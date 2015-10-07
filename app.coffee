@@ -26,6 +26,7 @@ app.use Metrics.http.monitor(logger)
 # Do routing here, example:
 app.get '/something', HttpController.something
 app.get '/index', HttpController.packageIndex
+app.post '/index/search', HttpController.search
 
 
 # Status Endpoint

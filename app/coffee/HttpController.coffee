@@ -1,6 +1,7 @@
 logger = require "logger-sharelatex"
 Errors = require "./Errors"
 fs = require "fs"
+{db, ObjectId} = require "./mongojs"
 
 module.exports = HttpController =
 
@@ -13,6 +14,23 @@ module.exports = HttpController =
 			return next(err) if err?
 			res.setHeader "Content-Type", "application/json"
 			res.status(200).send(index_data)
+
+	search: (req, res, next = (error) ->) ->
+		search_params = req.body
+		query = {
+			"$text": {"$search": search_params.query},
+			"language": search_params.language or 'python'
+		}
+		logger.log params: search_params, "searching package index"
+		db.searchIndex.find(query).limit(100, (err, docs=[]) ->
+			if err
+				return next err
+			logger.log params: search_params, count: docs.length "found packages in index, sending to client"
+			res.setHeader "Content-Type", "application/json"
+			result =
+				searchParams: search_params
+				results: docs
+			res.status(200).send(result)
 
 	load_index: (callback) ->
 		index_path = __dirname + '/../../data/packageIndex.json'
