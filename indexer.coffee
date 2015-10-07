@@ -214,19 +214,24 @@ module.exports = Indexer =
 		Indexer.buildPythonIndex (err, python_index) ->
 			if err?
 				return callback err
-			final_index =
-				indexBuiltAt: new Date().toISOString()
-				packages:
-					python: python_index
-					r: {}
-			callback null, final_index
+			Indexer.buildRIndex (err, r_index) ->
+				if err?
+					return callback err
+				final_index =
+					indexBuiltAt: new Date().toISOString()
+					packages:
+						python: python_index
+						r: r_index
+				callback null, final_index
 
-# args = process.argv.slice(2)
-# Indexer.build (err, result) ->
-# 	if err
-# 		throw err
-# 	if '--save' in args
-# 		result_json = JSON.stringify(result, null, 2)
-# 		fs.writeFileSync(__dirname + '/data/packageIndex.json', result_json)
-# 	if '--print' in args
-# 		console.log result
+if require.main == module
+	console.log ">> building package index..."
+	args = process.argv.slice(2)
+	Indexer.build (err, result) ->
+		if err
+			throw err
+		if '--save' in args
+			result_json = JSON.stringify(result, null, 2)
+			fs.writeFileSync(__dirname + '/data/packageIndex.json', result_json)
+		if '--print' in args
+			console.log result
