@@ -5,7 +5,7 @@ cheerio = require 'cheerio'
 _ = require 'underscore'
 async = require 'async'
 CsvParse = require 'csv-parse'
-
+{db, ObjectId} = require './app/js/mongojs'
 
 pypi_url = 'http://pypi.local'
 
@@ -212,14 +212,47 @@ module.exports = Indexer =
 						r: r_index
 				callback null, final_index
 
+	save_index_to_mongo: (index, callback) ->
+		console.log ">> writing to mongo"
+		db.packageIndex.ensureIndex {language: 1, name: 1}, {}, (err, result) ->
+			if err
+				return callback err
+			packages = []
+			for name in Object.keys(index.packages.python)
+				p = index.packages.python[name]
+				p.language = 'python'
+				packages.push(p)
+			for name in Object.keys(index.packages.r)
+				p = index.packages.r[name]
+				p.language = 'r'
+				packages.push(p)
+			console.log ">> packages: #{packages.length}"
+			async.mapLimit(packages, 100,
+				(doc, cb) ->
+					db.packageIndex.update {language: doc.language, name: doc.name}, doc, {upsert: true}, (err, result) ->
+						cb err, null
+				(err, results) ->
+					if err
+						return callback err, null
+					callback null
+			)
+
+
+
 if require.main == module
 	console.log ">> building package index..."
 	args = process.argv.slice(2)
 	Indexer.build (err, result) ->
 		if err
 			throw err
+		result_json = JSON.stringify(result, null, 2)
+		fs.writeFileSync(__dirname + '/data/packageIndex.json', result_json)
 		if '--save' in args
-			result_json = JSON.stringify(result, null, 2)
-			fs.writeFileSync(__dirname + '/data/packageIndex.json', result_json)
-		if '--print' in args
-			console.log result
+			Indexer.save_index_to_mongo result, (err) ->
+				if err
+					throw err
+				console.log ">> done"
+				process.exit()
+		else
+			console.log ">> done"
+			process.exit()
