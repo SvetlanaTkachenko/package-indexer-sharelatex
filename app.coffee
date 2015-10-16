@@ -25,8 +25,6 @@ app.use bodyParser.json()
 
 
 # Do routing here, example:
-app.get '/something', HttpController.something
-app.get '/index', HttpController.packageIndex
 app.post '/search', HttpController.search
 
 
