@@ -1,6 +1,7 @@
 logger = require "logger-sharelatex"
 Errors = require "./Errors"
 fs = require "fs"
+HealthChecker = require "./HealthChecker"
 {db, ObjectId} = require "./mongojs"
 
 module.exports = HttpController =
@@ -8,6 +9,15 @@ module.exports = HttpController =
 	something: (req, res) ->
 		logger.log "Something works"
 		res.send 200
+
+	health_check: (req, res) ->
+		logger.log "performing health check"
+		HealthChecker.check (err) ->
+			if err?
+				logger.log err: err, "error performing health check"
+				res.send 500
+			else
+				res.send 200
 
 	search: (req, res, next = (error) ->) ->
 		search_params = req.body

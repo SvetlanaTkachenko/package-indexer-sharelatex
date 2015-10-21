@@ -24,8 +24,8 @@ app.use Metrics.http.monitor(logger)
 app.use bodyParser.json()
 
 
-# Do routing here, example:
 app.post '/search', HttpController.search
+app.get  '/health_check', HttpController.health_check
 
 
 # Status Endpoint
