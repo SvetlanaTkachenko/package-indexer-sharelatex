@@ -1,5 +1,6 @@
 fs = require 'fs'
 child_process = require 'child_process'
+logger = require 'logger-sharelatex'
 request = require 'request'
 cheerio = require 'cheerio'
 _ = require 'underscore'
@@ -69,21 +70,16 @@ module.exports = Indexer =
 	buildPythonIndex: (callback) ->
 		conda_packages = Indexer.getCondaPackages()
 		conda_names = _.keys(conda_packages)
-		console.log ">> got all conda packages"
+		logger.log count: conda_names.length, "got all conda packages"
 
 		Indexer.getPipPackages (err, pip_packages) ->
 			if err?
 				return callback err
-			console.log ">> got all pip packages"
 			pip_names = _.keys(pip_packages)
+			logger.log count: pip_names.length, ">> got all pip packages"
 			pip_and_conda = _.intersection(conda_names, pip_names)
 			conda_only = _.difference(conda_names, pip_names)
 			pip_only = _.difference(pip_names, conda_names)
-
-			# console.log conda_only
-			console.log ">> pip: #{pip_only.length}"
-			console.log ">> conda: #{conda_only.length}"
-			console.log ">> both: #{pip_and_conda.length}"
 
 			python_packages = {}
 			for name in pip_only
@@ -163,25 +159,24 @@ module.exports = Indexer =
 	buildRIndex: (callback) ->
 		apt_packages = Indexer.getAptCranPackages()
 		apt_names = _.keys(apt_packages)
-		console.log ">> got all apt-cran packages"
+		logger.log count: apt_names.length, ">> got all apt-cran packages"
 
 		Indexer.getRemoteCranPackages (err, cran_packages) ->
 			if err?
 				return callback err
-			console.log ">> got all cran packages"
 			cran_names = _.keys(cran_packages)
+			logger.log count: cran_names.length, ">> got all cran packages"
 			Indexer.getBioConductorPackages (err, bioc_packages) ->
 				if err?
 					return callback err
-				console.log ">> got all bioconductor packages"
 				bioc_names = _.keys(bioc_packages)
+				logger.log count: bioc_names.length, ">> got all bioconductor packages"
 
 				r_packages = {}
 				# merge
 				apt_only = _.difference(apt_names, cran_names)
 				cran_only = _.difference(cran_names, apt_names)
 				apt_and_cran = _.intersection(apt_names, cran_names)
-				console.log ">> #{apt_only.length} - #{cran_only.length} - #{apt_and_cran.length} - #{bioc_names.length}"
 
 				# merge all into index
 				for name in bioc_names
@@ -213,7 +208,6 @@ module.exports = Indexer =
 				callback null, final_index
 
 	save_index_to_mongo: (index, callback) ->
-		console.log ">> writing to mongo"
 		db.packageIndex.ensureIndex {language: 1, name: 1}, {}, (err, result) ->
 			if err
 				return callback err
@@ -226,7 +220,7 @@ module.exports = Indexer =
 				p = index.packages.r[name]
 				p.language = 'r'
 				packages.push(p)
-			console.log ">> packages: #{packages.length}"
+			logger.log count: packages.length, "writing index to mongo"
 			async.mapLimit(packages, 100,
 				(doc, cb) ->
 					db.packageIndex.update {language: doc.language, name: doc.name}, doc, {upsert: true}, (err, result) ->
@@ -237,10 +231,8 @@ module.exports = Indexer =
 					callback null
 			)
 
-
-
 if require.main == module
-	console.log ">> building package index..."
+	logger.log "beginning package-index build"
 	args = process.argv.slice(2)
 	Indexer.build (err, result) ->
 		if err
@@ -251,8 +243,8 @@ if require.main == module
 			Indexer.save_index_to_mongo result, (err) ->
 				if err
 					throw err
-				console.log ">> done"
+				logger.log "done"
 				process.exit()
 		else
-			console.log ">> done"
+			logger.log "done"
 			process.exit()
