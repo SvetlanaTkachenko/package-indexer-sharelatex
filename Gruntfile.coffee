@@ -20,8 +20,9 @@ module.exports = (grunt) ->
 				dest: "app.js"
 
 			indexer:
-				src: "indexer.coffee"
-				dest: "indexer.js"
+				files:
+					'build-index.js': 'build-index.coffee'
+					'save-index.js': 'save-index.coffee'
 
 			unit_tests:
 				expand: true
@@ -45,7 +46,7 @@ module.exports = (grunt) ->
 				ext:  ".js"
 
 		clean:
-			indexer: ["indexer.js"]
+			indexer: ["build-index.js", "save-index.js"]
 			app: ["app/js/"]
 			unit_tests: ["test/unit/js"]
 			acceptance_tests: ["test/acceptance/js"]

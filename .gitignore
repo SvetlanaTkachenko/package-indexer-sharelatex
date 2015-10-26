@@ -4,6 +4,8 @@ test/unit/js
 test/acceptance/js
 app.js
 indexer.js
+build-index.js
+save-index.js
 forever
 .vagrant/
 data/packageIndex.json
