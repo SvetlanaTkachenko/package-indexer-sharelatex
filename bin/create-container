@@ -1,0 +1,13 @@
+#! /usr/bin/env bash
+
+echo ">> creating container to run indexer"
+
+docker run -d -P \
+       -v "$(pwd)":/indexer \
+       --name index-builder \
+       quay.io/sharelatex/datajoy:2015.6;
+
+docker exec index-builder bash -c "add-apt-repository -y ppa:chris-lea/node.js &&
+    apt-get update &&
+    apt-get install nodejs &&
+    node --version"

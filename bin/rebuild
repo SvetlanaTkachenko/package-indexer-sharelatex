@@ -1,0 +1,25 @@
+#! /usr/bin/env bash
+
+_TIMESTAMP=$(date "+%Y%m%d-%H%M%S")
+_INDEXFILE="data/packageIndex_$TIMESTAMP.json"
+
+echo ">> rebuilding package index with timestamp: $_TIMESTAMP";
+
+if [[ ! -e 'build-index.js' || ! -e 'save-index.js' ]];
+then
+    echo ">> can't find build-index.js or save-index.js, exiting";
+    exit 1;
+fi;
+
+
+if [[ -z $(docker ps -a | grep "^.*index-builder$") ]];
+then
+    ./bin/create-container
+fi;
+
+
+docker run -it --rm -P \
+    -v "$(pwd)":/indexer \
+    --name pleaseignore \
+    quay.io/sharelatex/datajoy:2015.6 \
+    bash -c "cd /indexer && node build-index.js -o $_INDEXFILE"
