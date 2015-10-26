@@ -49,22 +49,3 @@ cli.main (args, options) ->
 			throw err
 		logger.log "done"
 		process.exit()
-
-
-if require.main == module
-	logger.log "beginning package-index build"
-	args = process.argv.slice(2)
-	Indexer.build (err, result) ->
-		if err
-			throw err
-		result_json = JSON.stringify(result, null, 2)
-		fs.writeFileSync(__dirname + '/data/packageIndex.json', result_json)
-		if '--save' in args
-			Indexer.save_index_to_mongo result, (err) ->
-				if err
-					throw err
-				logger.log "done"
-				process.exit()
-		else
-			logger.log "done"
-			process.exit()
