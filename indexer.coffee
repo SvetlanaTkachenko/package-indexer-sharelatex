@@ -64,6 +64,7 @@ module.exports = Indexer =
 								source: 'pip'
 							url: p.details.info.package_url or null
 							summary: p.details.info.summary or null
+							downloads: p.details.info.downloads
 					callback null, packages
 			)
 
