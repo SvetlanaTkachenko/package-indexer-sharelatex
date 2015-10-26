@@ -20,4 +20,6 @@ fi;
 docker start index-builder;
 
 docker exec index-builder \
-    bash -c 'echo "hello"'
+    bash -c "cd /indexer && node build-index.js"
+
+echo ">> done"
