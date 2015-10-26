@@ -10,4 +10,6 @@ docker run -d -P \
 docker exec index-builder bash -c "add-apt-repository -y ppa:chris-lea/node.js &&
     apt-get update &&
     apt-get install nodejs &&
-    node --version"
+    node --version &&
+    cd /indexer &&
+    npm install"
