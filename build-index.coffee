@@ -9,13 +9,14 @@ async = require 'async'
 CsvParse = require 'csv-parse'
 
 pypi_url = 'http://pypi.local'
+pypi_url = 'http://pypi.python.org'
 
 
 module.exports = Indexer =
 
 	getCondaPackages: () ->
 		result = {}
-		conda_output = child_process.execSync ' conda search ".*" --names-only '
+		conda_output = child_process.execSync 'sudo conda search ".*" --names-only '
 		names = _.without(conda_output.toString().split('\n').slice(1), '')  # skip first line of output
 		(result[name] = {
 			name: name.trim(),
@@ -43,12 +44,10 @@ module.exports = Indexer =
 						timeout: 600 * 1000
 					request.get opts, (err, response, body) ->
 						if err?
-							error = new Error("Error: could not get #{package_name} from pypi. status: #{response?.statusCode}, #{err.message}")
-							error.err = err
-							return cb error, null
+							logger.log name: package_name, "Could not get #{package_name} from pypi. status: #{response?.statusCode}, #{err.message}"
 						info =
 							name: package_name,
-							details: if response.statusCode == 200 then body else {info: {}}
+							details: if response?.statusCode == 200 then body else {info: {}}
 						cb null, info
 				(err, results) ->
 					if err?
@@ -96,7 +95,7 @@ module.exports = Indexer =
 			callback(null, python_packages)
 
 	getAptCranPackages: () ->
-		child_process.execSync ' sudo apt-get update '
+		child_process.execSync ' apt-get update '
 		apt_packages = child_process.execSync ' apt-cache search "r-cran-.*" | grep "^r-cran.*$"'
 		lines = apt_packages.toString().split('\n')
 		packages = lines.map (line) ->
