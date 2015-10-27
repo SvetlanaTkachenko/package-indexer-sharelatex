@@ -11,15 +11,14 @@ then
     exit 1;
 fi;
 
-
 if [[ -z $(docker ps -q -f name=index-builder) ]];
 then
-    ./bin/create-container
+    ./bin/create-container;
 fi;
 
 docker start index-builder;
 
 docker exec index-builder \
-    bash -c "cd /indexer && node build-index.js"
+    bash -c "source ~/.nvm/nvm.sh && cd /indexer && node build-index.js"
 
 echo ">> done"
