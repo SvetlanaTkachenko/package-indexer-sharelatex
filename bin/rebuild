@@ -1,7 +1,7 @@
 #! /usr/bin/env bash
 
 _TIMESTAMP=$(date "+%Y%m%d-%H%M%S")
-_INDEXFILE="data/packageIndex_$TIMESTAMP.json"
+_INDEXFILE="data/packageIndex_$_TIMESTAMP.json"
 
 echo ">> rebuilding package index with timestamp: $_TIMESTAMP";
 
@@ -19,8 +19,8 @@ fi;
 docker start index-builder;
 
 docker exec index-builder \
-    bash -c "source ~/.nvm/nvm.sh && nvm use 4.2 && cd /indexer && node build-index.js"
+    bash -c "source ~/.nvm/nvm.sh && nvm use 4.2 && cd /indexer && node build-index.js -o $_INDEXFILE"
 
-node ./save-index.js
+# node ./save-index.js
 
 echo ">> done"

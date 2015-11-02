@@ -7,6 +7,7 @@ cheerio = require 'cheerio'
 _ = require 'underscore'
 async = require 'async'
 CsvParse = require 'csv-parse'
+deepExtend = require 'deep-extend'
 
 pypi_url = 'http://pypi.local'
 pypi_url = 'http://pypi.python.org'
@@ -36,7 +37,7 @@ module.exports = Indexer =
 			package_names = page.root().text().split('\n').slice(1)
 			async.mapLimit(
 				package_names,
-				200,
+				180,
 				(package_name, cb) ->
 					opts =
 						uri: "#{pypi_url}/pypi/#{package_name}/json"
@@ -193,6 +194,12 @@ module.exports = Indexer =
 
 				callback null, r_packages
 
+	applyOverrides: (index) ->
+		override_data = fs.readFileSync 'data/overrides.json'
+		overrides = JSON.parse(override_data)
+		deepExtend(index, overrides)
+		index
+
 	build: (callback) ->
 		Indexer.buildPythonIndex (err, python_index) ->
 			if err?
@@ -205,10 +212,11 @@ module.exports = Indexer =
 					packages:
 						python: python_index
 						r: r_index
+				final_index = Indexer.applyOverrides(final_index)
 				callback null, final_index
 
 cli.parse(
-	outfile: ['o', 'output file name', 'bool', 'data/packageIndex.json']
+	outfile: ['o', 'output file name', 'string', 'data/packageIndex.json']
 )
 
 cli.main (args, options) ->

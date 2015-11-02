@@ -1,0 +1,22 @@
+{
+		"packages": {
+				"python": {
+						"pygame": {
+								"provider": {
+										"source": "custom"
+								}
+						},
+						"pyasy": {
+								"name" : "pyasy",
+								"language" : "python",
+								"summary" : "PyAsy - Python frontend to the Asymptote vector graphics language",
+								"description" : "PyAsy - Python frontend to the Asymptote vector graphics language",
+								"url": "http://http://emmett.ca/PyAsy/",
+								"provider" : {
+										"source" : "custom"
+								}
+						}
+				},
+				"r": {}
+		}
+}
