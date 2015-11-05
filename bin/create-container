@@ -4,18 +4,18 @@ set -euf -o pipefail
 
 echo ">> creating container to run indexer"
 
-docker run -d -P \
-       --name index-builder \
-       quay.io/sharelatex/datajoy:2015.6;
+docker create -P \
+       --name index-build-container \
+       quay.io/sharelatex/datajoy:2015.6
 
-docker exec index-builder bash -c "apt-get update && apt-get install -y nginx &&
+docker exec index-build-container bash -c "apt-get update && apt-get install -y nginx &&
     cp /indexer/resources/nginx.conf /etc/nginx/nginx.conf &&
     mkdir -p /data/nginx &&
     service nginx stop && service nginx start"
 
-docker exec index-builder bash -c "echo '127.0.1.1	pypi.local' >> /etc/hosts"
+docker exec index-build-container bash -c "echo '127.0.1.1	pypi.local' >> /etc/hosts"
 
-docker exec index-builder bash -c "apt-get update && apt-get install -y git &&
+docker exec index-build-container bash -c "apt-get update && apt-get install -y git &&
     curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.29.0/install.sh | bash &&
     source ~/.nvm/nvm.sh &&
     nvm install 4.2"
