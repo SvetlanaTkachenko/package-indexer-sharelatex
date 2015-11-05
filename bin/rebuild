@@ -15,12 +15,16 @@ fi;
 
 [[ -z $(docker ps -a -q -f name=index-build-container) ]] && ./bin/create-container;
 
+echo ">> starting container"
 docker start index-build-container;
 
+echo ">> cleaning /indexer directory"
 docker exec index-build-container bash -c "[[ -e /indexer/package.json ]] && rm -rf /indexer"
 
+echo ">> copying $(pwd) into container"
 docker cp $(pwd) index-build-container:/indexer
 
+echo ">> building..."
 docker exec index-build-container \
     bash -c "source ~/.nvm/nvm.sh &&
         nvm use 4.2 &&
@@ -29,6 +33,7 @@ docker exec index-build-container \
         echo '>> running build-index.js inside container' &&
         node build-index.js -o $_INDEXFILE"
 
+echo ">> copying data file out of container"
 docker cp "index-build-container:/indexer/data/$_INDEXFILE" ./data/$_INDEXFILE
 
 # node ./save-index.js
