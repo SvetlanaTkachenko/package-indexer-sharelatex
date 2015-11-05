@@ -6,7 +6,6 @@ _TIMESTAMP=$(date "+%Y%m%d-%H%M%S")
 # _INDEXFILE="data/packageIndex_$_TIMESTAMP.json"
 _INDEXFILE="data/packageIndex.json"
 
-echo ">> rebuilding package index with timestamp: $_TIMESTAMP";
 
 if [[ ! -e 'build-index.js' || ! -e 'save-index.js' ]];
 then

@@ -1,6 +1,5 @@
 #! /usr/bin/env bash
 
-set -euf -o pipefail
 
 echo ">> creating container to run indexer"
 
