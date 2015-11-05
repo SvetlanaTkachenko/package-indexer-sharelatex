@@ -19,12 +19,19 @@ fi;
 
 docker start index-builder;
 
+docker exec index-builder bash -c "[[ -e /indexer/package.json ]] && rm -rf /indexer"
+
+docker cp $(pwd) index-builder:/indexer
+
 docker exec index-builder \
     bash -c "source ~/.nvm/nvm.sh &&
         nvm use 4.2 &&
         cd /indexer &&
+        npm install &&
         echo '>> running build-index.js inside container' &&
         node build-index.js -o $_INDEXFILE"
+
+docker cp "index-builder:/indexer/data/$_INDEXFILE" ./data/$_INDEXFILE
 
 # node ./save-index.js
 
