@@ -17,7 +17,7 @@ module.exports = Indexer =
 
 	getCondaPackages: () ->
 		result = {}
-		conda_output = child_process.execSync 'conda search ".*" --names-only '
+		conda_output = child_process.execSync 'sudo conda search ".*" --names-only '
 		names = _.without(conda_output.toString().split('\n').slice(1), '')  # skip first line of output
 		(result[name] = {
 			name: name.trim(),
@@ -96,7 +96,7 @@ module.exports = Indexer =
 			callback(null, python_packages)
 
 	getAptCranPackages: () ->
-		child_process.execSync 'sudo apt-get update '
+		child_process.execSync 'apt-get update '
 		apt_packages = child_process.execSync ' apt-cache search "r-cran-.*" | grep "^r-cran.*$"'
 		lines = apt_packages.toString().split('\n')
 		packages = lines.map (line) ->
