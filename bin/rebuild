@@ -20,7 +20,11 @@ fi;
 docker start index-builder;
 
 docker exec index-builder \
-    bash -c "source ~/.nvm/nvm.sh && nvm use 4.2 && cd /indexer && node build-index.js -o $_INDEXFILE"
+    bash -c "source ~/.nvm/nvm.sh &&
+        nvm use 4.2 &&
+        cd /indexer &&
+        echo '>> running build-index.js inside container' &&
+        node build-index.js -o $_INDEXFILE"
 
 # node ./save-index.js
 
