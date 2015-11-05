@@ -1,5 +1,7 @@
 #! /usr/bin/env bash
 
+set -euf -o pipefail
+
 _TIMESTAMP=$(date "+%Y%m%d-%H%M%S")
 # _INDEXFILE="data/packageIndex_$_TIMESTAMP.json"
 _INDEXFILE="data/packageIndex.json"
