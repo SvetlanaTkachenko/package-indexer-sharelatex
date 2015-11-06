@@ -33,8 +33,8 @@ docker exec index-build-container \
         echo '>> running build-index.js inside container' &&
         node build-index.js -o $_INDEXFILE"
 
-echo ">> copying data file out of container"
-docker cp "index-build-container:/indexer/$_INDEXFILE" .
+echo ">> copying $_INDEXFILE file out of container"
+docker cp "index-build-container:/indexer/$_INDEXFILE" "./$_INDEXFILE"
 
 # node ./save-index.js
 
