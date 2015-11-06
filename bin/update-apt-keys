@@ -1,0 +1,11 @@
+#! /usr/bin/env bash
+
+declare -a expired_keys
+expired_keys=($(docker exec index-build-container \
+											 apt-key list | grep '\[expired:' | awk '{ print $2 }' | sed -E 's/(.*)\/(.*)/\2/'))
+if [[ ${#expired_keys[@]} -gt 0 ]];
+then
+		echo ">> updating expired keys (${expired_keys[@]}) in container"
+		docker exec index-build-container \
+					 apt-key adv --keyserver keyserver.ubuntu.com --recv-keys "${expired_keys[@]}"
+fi;

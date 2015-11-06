@@ -18,6 +18,8 @@ fi;
 echo ">> starting container"
 docker start index-build-container;
 
+./bin/update-apt-keys
+
 echo ">> cleaning /indexer directory"
 docker exec index-build-container bash -c "[[ -e /indexer/package.json ]] && rm -rf /indexer"
 
