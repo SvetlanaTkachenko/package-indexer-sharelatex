@@ -212,7 +212,7 @@ module.exports = Indexer =
 					packages:
 						python: python_index
 						r: r_index
-				final_index = Indexer.applyOverrides(final_index)
+				# final_index = Indexer.applyOverrides(final_index)
 				callback null, final_index
 
 cli.parse(
