@@ -17,6 +17,12 @@
 								}
 						}
 				},
-				"r": {}
+				"r": {
+						"EBImage": {
+								"provider": {
+										"source": "custom"
+								}
+						}
+				}
 		}
 }
