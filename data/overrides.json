@@ -22,6 +22,11 @@
 								"provider": {
 										"source": "custom"
 								}
+						},
+						"rgdal": {
+								"provider": {
+										"source": "custom"
+								}
 						}
 				}
 		}
