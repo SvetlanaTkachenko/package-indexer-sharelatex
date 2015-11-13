@@ -44,12 +44,12 @@ module.exports = Indexer =
 						json: true
 						timeout: 600 * 1000
 					request.get opts, (err, response, body) ->
-						if err?
+						if err? or response?.statusCode != 200
 							logger.log name: package_name, "Could not get #{package_name} from pypi. status: #{response?.statusCode}, #{err.message}"
-						info =
+						data =
 							name: package_name,
 							details: if response?.statusCode == 200 then body else {info: {}}
-						cb null, info
+						cb null, data
 				(err, results) ->
 					if err?
 						return callback err, null
