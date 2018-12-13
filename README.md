@@ -3,6 +3,8 @@ package-indexer-sharelatex
 
 A system for building a package index.
 
+This repository is no longer maintained and has now been archived.
+
 
 License
 -------
